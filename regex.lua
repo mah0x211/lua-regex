@@ -46,10 +46,11 @@ local CFLG2OPT_LUT = {
 -- @return jit
 -- @return sticky
 local function flgs2opts( flgs, lut )
+    local opts = {};
+    local jit, sticky;
+
     if flgs then
-        local opts = {};
         local nopt = 0;
-        local jit, sticky;
 
         assert( type( flgs ) == 'string', 'flgs must be string' );
         for i = 1, #flgs do
@@ -80,9 +81,9 @@ local function flgs2opts( flgs, lut )
                 opts[nopt] = opt;
             end
         end
-
-        return nopt > 0 and opts, jit, sticky;
     end
+
+    return opts, jit, sticky;
 end
 
 
