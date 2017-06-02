@@ -39,6 +39,53 @@ local CFLG2OPT_LUT = {
 };
 
 
+--- flgs2opts
+-- @param flgs
+-- @param lut
+-- @return opts
+-- @return jit
+-- @return sticky
+local function flgs2opts( flgs, lut )
+    if flgs then
+        local opts = {};
+        local nopt = 0;
+        local jit, sticky;
+
+        assert( type( flgs ) == 'string', 'flgs must be string' );
+        for i = 1, #flgs do
+            local flg = flgs:sub( i, i );
+
+            -- jit compile flag
+            if flg == 'j' then
+                jit = true;
+            -- sticky flag
+            elseif flg == 'y' then
+                sticky = true;
+            -- do not check the pattern for UTF valid.
+            -- only relevant if UTF option is set.
+            elseif flg == 'U' then
+                opts[nopt + 1] = pcre2.UTF;
+                opts[nopt + 2] = pcre2.NO_UTF_CHECK;
+                nopt = nopt + 2;
+            else
+                local opt = lut[flg];
+
+                -- invalid flag
+                if not opt then
+                    error( ('unknown flag %q'):format( opt ) );
+                end
+
+                -- add option
+                nopt = nopt + 1;
+                opts[nopt] = opt;
+            end
+        end
+
+        return nopt > 0 and opts, jit, sticky;
+    end
+end
+
+
 --- class Regex
 local Regex = {};
 
@@ -100,39 +147,8 @@ end
 -- @return regex
 -- @return err
 local function new( pattern, flgs )
-    local opts = {};
-    local p, jit, sticky, err;
-
-    -- parse compile flags
-    if flgs then
-        assert( type( flgs ) == 'string', 'flgs must be string' );
-        for i = 1, #flgs do
-            local flg = flgs:sub( i, i );
-
-            -- jit compile flag
-            if flg == 'j' then
-                jit = true;
-            -- sticky flag
-            elseif flg == 'y' then
-                sticky = true;
-            -- do not check the pattern for UTF valid.
-            -- only relevant if UTF option is set.
-            elseif flg == 'U' then
-                opts[#opts + 1] = pcre2.UTF;
-                opts[#opts + 1] = pcre2.NO_UTF_CHECK;
-            else
-                local opt = CFLG2OPT_LUT[flg];
-
-                -- invalid flag
-                if not opt then
-                    error( ('unknown flag %q'):format( opt ) );
-                end
-
-                -- add option
-                opts[#opts + 1] = opt;
-            end
-        end
-    end
+    local opts, jit, sticky = flgs2opts( flgs, CFLG2OPT_LUT );
+    local p, err;
 
     -- compile
     p, err = pcre2.new( pattern, unpack( opts ) );
