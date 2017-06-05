@@ -256,7 +256,25 @@ local function gmatch( sbj, pattern, flgs )
 end
 
 
+--- match
+-- @param sbj
+-- @param pattern
+-- @param flgs
+-- @return arr
+-- @return err
+local function match( sbj, pattern, flgs )
+    local re, err = new( pattern, flgs );
+
+    if err then
+        return nil, err;
+    end
+
+    return re:match( sbj );
+end
+
+
 return {
     new = new,
-    gmatch = gmatch
+    gmatch = gmatch,
+    match = match
 };
