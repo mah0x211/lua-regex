@@ -99,16 +99,16 @@ end
 local Regex = {};
 
 
---- gmatch
+--- matches
 -- @param sbj
 -- @return arr
 -- @return err
-function Regex:gmatch( sbj )
+function Regex:matches( sbj )
     local head, tail, err = self.p:match_nocap( sbj );
 
     if err then
         return nil, err;
-    -- matched
+    -- found
     else
         local arr = {};
         local idx = 1;
@@ -135,7 +135,7 @@ end
 function Regex:match( sbj )
     local head, tail, err = self.p:match( sbj, self.lastIndex );
 
-    -- matched
+    -- found
     if head then
         local arr = {};
 
@@ -167,7 +167,7 @@ end
 function Regex:test( sbj )
     local head, tail, err = self.p:match_nocap( sbj, self.lastIndex );
 
-    -- matched
+    -- found
     if head then
         -- updaet a last-index if global option is enabled
         if self.global == true then
@@ -239,20 +239,20 @@ local function new( pattern, flgs )
 end
 
 
---- gmatch
+--- matches
 -- @param sbj
 -- @param pattern
 -- @param flgs
 -- @return arr
 -- @return err
-local function gmatch( sbj, pattern, flgs )
+local function matches( sbj, pattern, flgs )
     local re, err = new( pattern, flgs );
 
     if err then
         return nil, err;
     end
 
-    return re:gmatch( sbj );
+    return re:matches( sbj );
 end
 
 
@@ -292,7 +292,7 @@ end
 
 return {
     new = new,
-    gmatch = gmatch,
+    matches = matches,
     match = match,
     test = test
 };
