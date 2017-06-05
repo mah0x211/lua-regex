@@ -273,8 +273,26 @@ local function match( sbj, pattern, flgs )
 end
 
 
+--- test
+-- @param sbj
+-- @param pattern
+-- @param flgs
+-- @return ok
+-- @return err
+local function test( sbj, pattern, flgs )
+    local re, err = new( pattern, flgs );
+
+    if err then
+        return nil, err;
+    end
+
+    return re:test( sbj );
+end
+
+
 return {
     new = new,
     gmatch = gmatch,
-    match = match
+    match = match,
+    test = test
 };
