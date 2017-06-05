@@ -101,10 +101,11 @@ local Regex = {};
 
 --- matches
 -- @param sbj
+-- @param offset
 -- @return arr
 -- @return err
-function Regex:matches( sbj )
-    local head, tail, err = self.p:match_nocap( sbj );
+function Regex:matches( sbj, offset )
+    local head, tail, err = self.p:match_nocap( sbj, offset );
 
     if err then
         return nil, err;
@@ -130,10 +131,11 @@ end
 
 --- match
 -- @param sbj
+-- @param offset
 -- @return arr
 -- @return err
-function Regex:match( sbj )
-    local head, tail, err = self.p:match( sbj, self.lastIndex );
+function Regex:match( sbj, offset )
+    local head, tail, err = self.p:match( sbj, offset or self.lastIndex );
 
     -- found
     if head then
@@ -162,10 +164,11 @@ end
 
 --- test
 -- @param sbj
+-- @param offset
 -- @return ok
 -- @return err
-function Regex:test( sbj )
-    local head, tail, err = self.p:match_nocap( sbj, self.lastIndex );
+function Regex:test( sbj, offset )
+    local head, tail, err = self.p:match_nocap( sbj, offset or self.lastIndex );
 
     -- found
     if head then
@@ -243,16 +246,17 @@ end
 -- @param sbj
 -- @param pattern
 -- @param flgs
+-- @param offset
 -- @return arr
 -- @return err
-local function matches( sbj, pattern, flgs )
+local function matches( sbj, pattern, flgs, offset )
     local re, err = new( pattern, flgs );
 
     if err then
         return nil, err;
     end
 
-    return re:matches( sbj );
+    return re:matches( sbj, offset );
 end
 
 
@@ -260,16 +264,17 @@ end
 -- @param sbj
 -- @param pattern
 -- @param flgs
+-- @param offset
 -- @return arr
 -- @return err
-local function match( sbj, pattern, flgs )
+local function match( sbj, pattern, flgs, offset )
     local re, err = new( pattern, flgs );
 
     if err then
         return nil, err;
     end
 
-    return re:match( sbj );
+    return re:match( sbj, offset );
 end
 
 
@@ -277,16 +282,17 @@ end
 -- @param sbj
 -- @param pattern
 -- @param flgs
+-- @param offset
 -- @return ok
 -- @return err
-local function test( sbj, pattern, flgs )
-    local re, err = new( pattern, flgs );
+local function test( sbj, pattern, flgs, offset )
+    local re, err = new( pattern, flgs, offset );
 
     if err then
         return nil, err;
     end
 
-    return re:test( sbj );
+    return re:test( sbj, offset );
 end
 
 
