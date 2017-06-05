@@ -44,10 +44,9 @@ local CFLG2OPT_LUT = {
 -- @param lut
 -- @return opts
 -- @return jit
--- @return sticky
 local function flgs2opts( flgs, lut )
     local opts = {};
-    local jit, sticky;
+    local jit;
 
     if flgs then
         local nopt = 0;
@@ -59,9 +58,6 @@ local function flgs2opts( flgs, lut )
             -- jit compile flag
             if flg == 'j' then
                 jit = true;
-            -- sticky flag
-            elseif flg == 'y' then
-                sticky = true;
             -- do not check the pattern for UTF valid.
             -- only relevant if UTF option is set.
             elseif flg == 'U' then
@@ -83,7 +79,7 @@ local function flgs2opts( flgs, lut )
         end
     end
 
-    return opts, jit, sticky;
+    return opts, jit;
 end
 
 
@@ -148,7 +144,7 @@ end
 -- @return regex
 -- @return err
 local function new( pattern, flgs )
-    local opts, jit, sticky = flgs2opts( flgs, CFLG2OPT_LUT );
+    local opts, jit = flgs2opts( flgs, CFLG2OPT_LUT );
     local p, err;
 
     -- compile
@@ -167,8 +163,7 @@ local function new( pattern, flgs )
 
     -- create instance
     return setmetatable({
-        p = p,
-        sticky = sticky
+        p = p
     }, {
         __index = Regex
     });
