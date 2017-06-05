@@ -160,6 +160,38 @@ function Regex:match( sbj, offset )
 end
 
 
+--- indexesof
+-- @param sbj
+-- @param offset
+-- @return heads
+-- @return tails
+-- @return err
+function Regex:indexesof( sbj, offset )
+    local head, tail, err = self.p:match_nocap( sbj, offset );
+
+    -- found
+    if head then
+        local heads = {};
+        local tails = {};
+        local idx = 1;
+
+        repeat
+            heads[idx], tails[idx] = head, tail;
+            idx = idx + 1;
+
+            head, tail, err = self.p:match_nocap( sbj, tail );
+            if err then
+                return nil, nil, err;
+            end
+        until head == nil;
+
+        return heads, tails;
+    end
+
+    return nil, nil, err;
+end
+
+
 --- indexof
 -- @param sbj
 -- @param offset
