@@ -160,6 +160,32 @@ function Regex:match( sbj, offset )
 end
 
 
+--- indexof
+-- @param sbj
+-- @param offset
+-- @return heads
+-- @return tails
+-- @return err
+function Regex:indexof( sbj, offset )
+    local heads, tails, err = self.p:match( sbj, offset or self.lastidx );
+
+    -- found
+    if heads then
+        -- updaet a last-index if global option is enabled
+        if self.global == true then
+            self.lastidx = tails[1];
+        end
+
+        return heads, tails;
+    -- reset a last-index to 0 if global option is enabled
+    elseif self.global then
+        self.lastidx = 0;
+    end
+
+    return nil, nil, err;
+end
+
+
 --- test
 -- @param sbj
 -- @param offset
