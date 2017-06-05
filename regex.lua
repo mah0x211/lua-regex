@@ -332,6 +332,25 @@ local function match( sbj, pattern, flgs, offset )
 end
 
 
+--- indexesof
+-- @param sbj
+-- @param pattern
+-- @param flgs
+-- @param offset
+-- @return heads
+-- @return tails
+-- @return err
+local function indexesof( sbj, pattern, flgs, offset )
+    local re, err = new( pattern, flgs );
+
+    if err then
+        return nil, err;
+    end
+
+    return re:indexesof( sbj, offset );
+end
+
+
 --- indexof
 -- @param sbj
 -- @param pattern
@@ -373,6 +392,7 @@ return {
     new = new,
     matches = matches,
     match = match,
+    indexesof = indexesof,
     indexof = indexof,
     test = test
 };
