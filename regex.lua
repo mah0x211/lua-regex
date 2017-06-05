@@ -152,6 +152,32 @@ function Regex:match( sbj )
 end
 
 
+--- test
+-- @param sbj
+-- @return ok
+-- @return err
+function Regex:test( sbj )
+    local head, tail, err = self.p:match_nocap( sbj, self.lastIndex );
+
+    -- matched
+    if head then
+        -- updaet a last-index if global option is enabled
+        if self.global == true then
+            self.lastIndex = tail;
+        else
+            self.lastIndex = nil;
+        end
+
+        return true;
+    -- reset a last-index to 0 if global option is enabled
+    elseif self.global then
+        self.lastIndex = 0;
+    end
+
+    return false, err;
+end
+
+
 --- new
 -- @param pattern
 -- @param flgs
