@@ -239,6 +239,24 @@ local function new( pattern, flgs )
 end
 
 
+--- gmatch
+-- @param sbj
+-- @param pattern
+-- @param flgs
+-- @return arr
+-- @return err
+local function gmatch( sbj, pattern, flgs )
+    local re, err = new( pattern, flgs );
+
+    if err then
+        return nil, err;
+    end
+
+    return re:gmatch( sbj );
+end
+
+
 return {
-    new = new
+    new = new,
+    gmatch = gmatch
 };
