@@ -135,7 +135,7 @@ end
 -- @return arr
 -- @return err
 function Regex:match( sbj, offset )
-    local head, tail, err = self.p:match( sbj, offset or self.lastIndex );
+    local head, tail, err = self.p:match( sbj, offset or self.lastidx );
 
     -- found
     if head then
@@ -147,13 +147,13 @@ function Regex:match( sbj, offset )
 
         -- updaet a last-index if global option is enabled
         if self.global == true then
-            self.lastIndex = tail[1];
+            self.lastidx = tail[1];
         end
 
         return arr;
     -- reset a last-index to 0 if global option is enabled
     elseif self.global then
-        self.lastIndex = 0;
+        self.lastidx = 0;
     end
 
     return nil, err;
@@ -166,19 +166,19 @@ end
 -- @return ok
 -- @return err
 function Regex:test( sbj, offset )
-    local head, tail, err = self.p:match_nocap( sbj, offset or self.lastIndex );
+    local head, tail, err = self.p:match_nocap( sbj, offset or self.lastidx );
 
     -- found
     if head then
         -- updaet a last-index if global option is enabled
         if self.global == true then
-            self.lastIndex = tail;
+            self.lastidx = tail;
         end
 
         return true;
     -- reset a last-index to 0 if global option is enabled
     elseif self.global then
-        self.lastIndex = 0;
+        self.lastidx = 0;
     end
 
     return false, err;
@@ -223,7 +223,7 @@ local function new( pattern, flgs )
         re = setmetatable({
             p = p,
             global = global,
-            lastIndex = 0
+            lastidx = 0
         }, {
             __index = Regex
         });
