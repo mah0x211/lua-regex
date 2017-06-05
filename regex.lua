@@ -37,6 +37,10 @@ local CFLG2OPT_LUT = {
     u = pcre2.UTF,          --: Treat pattern and subjects as UTF strings.
     x = pcre2.EXTENDED,     --: Ignore white space and `#` comments
 };
+--- static variables
+local RECACHE = setmetatable({},{
+    __mode = 'v'
+});
 
 
 --- flgs2opts
@@ -44,10 +48,11 @@ local CFLG2OPT_LUT = {
 -- @param lut
 -- @return opts
 -- @return global
+-- @return cache
 -- @return jit
 local function flgs2opts( flgs, lut )
     local opts = {};
-    local global, jit;
+    local global, cache, jit;
 
     if flgs then
         local nopt = 0;
@@ -62,6 +67,9 @@ local function flgs2opts( flgs, lut )
             -- global flag
             elseif flg == 'g' then
                 global = true;
+            -- compile-once mode flag
+            elseif flg == 'o' then
+                cache = true;
             -- do not check the pattern for UTF valid.
             -- only relevant if UTF option is set.
             elseif flg == 'U' then
@@ -83,7 +91,7 @@ local function flgs2opts( flgs, lut )
         end
     end
 
-    return opts, global, jit;
+    return opts, global, cache, jit;
 end
 
 
@@ -184,31 +192,50 @@ end
 -- @return regex
 -- @return err
 local function new( pattern, flgs )
-    local opts, global, jit = flgs2opts( flgs, CFLG2OPT_LUT );
-    local p, err;
+    local opts, global, cache, jit, re;
 
-    -- compile
-    p, err = pcre2.new( pattern, unpack( opts ) );
-    if not p then
-        return nil, err;
-    -- jit compile
-    elseif jit then
-        local ok;
+    assert( type( pattern ) == 'string', 'pattern must be string' );
+    -- parse flags
+    opts, global, cache, jit = flgs2opts( flgs, CFLG2OPT_LUT );
 
-        ok, err = p:jit_compile();
-        if not ok then
+    -- check the cache table
+    if cache then
+        cache = pattern .. '@' .. flgs;
+        re = RECACHE[cache];
+    end
+
+    if not re then
+        -- compile
+        local p, err = pcre2.new( pattern, unpack( opts ) );
+
+        if not p then
             return nil, err;
+        -- jit compile
+        elseif jit then
+            local ok;
+
+            ok, err = p:jit_compile();
+            if not ok then
+                return nil, err;
+            end
+        end
+
+        -- create instance
+        re = setmetatable({
+            p = p,
+            global = global,
+            lastIndex = 0
+        }, {
+            __index = Regex
+        });
+
+        -- save into cache table
+        if cache then
+            RECACHE[cache] = re;
         end
     end
 
-    -- create instance
-    return setmetatable({
-        p = p,
-        global = global,
-        lastIndex = 0
-    }, {
-        __index = Regex
-    });
+    return re;
 end
 
 
