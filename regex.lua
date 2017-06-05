@@ -148,8 +148,6 @@ function Regex:match( sbj, offset )
         -- updaet a last-index if global option is enabled
         if self.global == true then
             self.lastIndex = tail[1];
-        else
-            self.lastIndex = nil;
         end
 
         return arr;
@@ -175,8 +173,6 @@ function Regex:test( sbj, offset )
         -- updaet a last-index if global option is enabled
         if self.global == true then
             self.lastIndex = tail;
-        else
-            self.lastIndex = nil;
         end
 
         return true;
