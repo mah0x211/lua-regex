@@ -43,10 +43,11 @@ local CFLG2OPT_LUT = {
 -- @param flgs
 -- @param lut
 -- @return opts
+-- @return global
 -- @return jit
 local function flgs2opts( flgs, lut )
     local opts = {};
-    local jit;
+    local global, jit;
 
     if flgs then
         local nopt = 0;
@@ -58,6 +59,9 @@ local function flgs2opts( flgs, lut )
             -- jit compile flag
             if flg == 'j' then
                 jit = true;
+            -- global flag
+            elseif flg == 'g' then
+                global = true;
             -- do not check the pattern for UTF valid.
             -- only relevant if UTF option is set.
             elseif flg == 'U' then
@@ -79,7 +83,7 @@ local function flgs2opts( flgs, lut )
         end
     end
 
-    return opts, jit;
+    return opts, global, jit;
 end
 
 
@@ -121,7 +125,7 @@ end
 -- @return arr
 -- @return err
 function Regex:match( sbj )
-    local head, tail, err = self.p:match( sbj );
+    local head, tail, err = self.p:match( sbj, self.lastIndex );
 
     -- matched
     if head then
@@ -131,7 +135,17 @@ function Regex:match( sbj )
             arr[i] = sbj:sub( head[i], tail[i] );
         end
 
+        -- updaet a last-index if global option is enabled
+        if self.global == true then
+            self.lastIndex = tail[1];
+        else
+            self.lastIndex = nil;
+        end
+
         return arr;
+    -- reset a last-index to 0 if global option is enabled
+    elseif self.global then
+        self.lastIndex = 0;
     end
 
     return nil, err;
@@ -144,7 +158,7 @@ end
 -- @return regex
 -- @return err
 local function new( pattern, flgs )
-    local opts, jit = flgs2opts( flgs, CFLG2OPT_LUT );
+    local opts, global, jit = flgs2opts( flgs, CFLG2OPT_LUT );
     local p, err;
 
     -- compile
@@ -163,7 +177,9 @@ local function new( pattern, flgs )
 
     -- create instance
     return setmetatable({
-        p = p
+        p = p,
+        global = global,
+        lastIndex = 0
     }, {
         __index = Regex
     });
