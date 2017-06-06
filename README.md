@@ -48,7 +48,7 @@ creates a new regex object.
 - `err:string`: error message.
 
 
-## Methods
+## Instance Methods
 
 
 ### arr, err = re:match( sbj [, offset] )
@@ -127,4 +127,94 @@ returns true if there is a matched.
 - `ok:boolean`: true on matched.
 - `err:string`: error message.
 
+
+
+## Static Methods
+
+
+### arr, err = regex.match( sbj, pattern [, flgs [, offset]] )
+
+same as `match` instance method.
+
+**Params**
+
+- `sbj:string`: the subject string.
+- `pattern:string`: string containing expression to be compiled.
+- `flgs:string`: [regular expression flags](#regular-expression-flags).
+- `offset:number`: offset in the subject at which to start matching.
+
+**Returns**
+
+- `arr:table`: array of matched substrings.
+- `err:string`: error message.
+
+
+### arr, err = regex.matches( sbj, pattern [, flgs [, offset]] )
+
+same as `matches` instance method.
+
+**Params**
+
+- `sbj:string`: the subject string.
+- `pattern:string`: string containing expression to be compiled.
+- `flgs:string`: [regular expression flags](#regular-expression-flags).
+- `offset:number`: offset in the subject at which to start matching.
+
+**Returns**
+
+- `arr:table`: array of matched substrings.
+- `err:string`: error message.
+
+
+### heads, tails, err = regex.indexof( sbj, pattern [, flgs [, offset]] )
+
+same as `indexof` instance method.
+
+**Params**
+
+- `sbj:string`: the subject string.
+- `pattern:string`: string containing expression to be compiled.
+- `flgs:string`: [regular expression flags](#regular-expression-flags).
+- `offset:number`: offset in the subject at which to start matching.
+
+**Returns**
+
+- `heads:table`: array of head offset of matched substrings.
+- `tails:table`: array of tail offset of matched substrings.
+- `err:string`: error message.
+
+
+### heads, tails, err = regex.indexesof( sbj, pattern [, flgs [, offset]] )
+
+same as `indexesof` instance method.
+
+**Params**
+
+- `sbj:string`: the subject string.
+- `pattern:string`: string containing expression to be compiled.
+- `flgs:string`: [regular expression flags](#regular-expression-flags).
+- `offset:number`: offset in the subject at which to start matching.
+
+**Returns**
+
+- `heads:table`: array of head offset of matched substrings.
+- `tails:table`: array of tail offset of matched substrings.
+- `err:string`: error message.
+
+
+### ok, err = regex.test( sbj, pattern [, flgs [, offset]] )
+
+same as `test` instance method.
+
+**Params**
+
+- `sbj:string`: the subject string.
+- `pattern:string`: string containing expression to be compiled.
+- `flgs:string`: [regular expression flags](#regular-expression-flags).
+- `offset:number`: offset in the subject at which to start matching.
+
+**Returns**
+
+- `ok:boolean`: true on matched.
+- `err:string`: error message.
 
