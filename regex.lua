@@ -111,7 +111,6 @@ function Regex:matches(sbj, offset)
             idx = idx + 1
             head, tail, err = self.p:match_nocap(sbj, tail)
         end
-
         if err then
             return nil, err
         end
@@ -174,6 +173,7 @@ function Regex:indexesof(sbj, offset)
         if err then
             return nil, nil, err
         end
+
         return heads, tails
     end
 
@@ -324,7 +324,7 @@ end
 local function indexesof(sbj, pattern, flgs, offset)
     local re, err = new(pattern, flgs)
     if err then
-        return nil, err
+        return nil, nil, err
     end
     return re:indexesof(sbj, offset)
 end
@@ -340,7 +340,7 @@ end
 local function indexof(sbj, pattern, flgs, offset)
     local re, err = new(pattern, flgs)
     if err then
-        return nil, err
+        return nil, nil, err
     end
     return re:indexof(sbj, offset)
 end
@@ -355,7 +355,7 @@ end
 local function test(sbj, pattern, flgs, offset)
     local re, err = new(pattern, flgs, offset)
     if err then
-        return nil, err
+        return false, err
     end
     return re:test(sbj, offset)
 end
