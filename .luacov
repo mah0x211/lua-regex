@@ -1,0 +1,6 @@
+codefromstrings = false
+runreport = true
+deletestats = false
+modules = {
+    regex = 'regex.lua',
+}
