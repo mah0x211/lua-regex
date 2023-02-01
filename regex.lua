@@ -355,7 +355,7 @@ end
 local function test(sbj, pattern, flgs, offset)
     local re, err = new(pattern, flgs, offset)
     if err then
-        return nil, err
+        return false, err
     end
     return re:test(sbj, offset)
 end
