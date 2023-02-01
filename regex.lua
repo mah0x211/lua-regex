@@ -340,7 +340,7 @@ end
 local function indexof(sbj, pattern, flgs, offset)
     local re, err = new(pattern, flgs)
     if err then
-        return nil, err
+        return nil, nil, err
     end
     return re:indexof(sbj, offset)
 end
