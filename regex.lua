@@ -76,7 +76,7 @@ local function flgs2opts(flgs)
             local opt = CFLG2OPT_LUT[flg]
             if not opt then
                 -- invalid flag
-                error(('unknown flag %q'):format(opt))
+                error(('unknown flag %q'):format(flg))
             end
 
             -- add option
