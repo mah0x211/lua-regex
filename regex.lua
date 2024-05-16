@@ -41,21 +41,21 @@ local RECACHE = setmetatable({}, {
     __mode = 'v',
 })
 
---- flgs2opts
---- @param flgs string
+--- flags2opts
+--- @param flags string
 --- @return table opts
 --- @return boolean global
 --- @return boolean cache
 --- @return boolean jit
-local function flgs2opts(flgs)
+local function flags2opts(flags)
     local opts = {}
     local global = false
     local cache = false
     local jit = false
     local nopt = 0
 
-    for i = 1, #flgs do
-        local flg = sub(flgs, i, i)
+    for i = 1, #flags do
+        local flg = sub(flags, i, i)
 
         if flg == 'j' then
             -- jit compile flag
@@ -88,11 +88,60 @@ local function flgs2opts(flgs)
     return opts, global, cache, jit
 end
 
---- @class Regex
+--- @class regex
 --- @field p pcre2
 --- @field global boolean
 --- @field lastidx integer
 local Regex = {}
+
+--- init
+--- @param pattern string
+--- @param flags string?
+--- @return regex? regex
+--- @return any err
+function Regex:init(pattern, flags)
+    assert(type(pattern) == 'string', 'pattern must be string')
+    assert(flags == nil or type(flags) == 'string',
+           'flags must be string or nil')
+    if not flags then
+        flags = ''
+    end
+
+    -- parse flags
+    local cache_key = pattern .. '@' .. flags
+    local opts, global, cache, jit = flags2opts(flags)
+    -- check the cache table
+    if cache then
+        -- return the cached object if exists
+        local re = RECACHE[cache_key]
+        if re then
+            return re
+        end
+    end
+
+    -- compile pattern
+    local p, err = pcre2.new(pattern, unpack(opts))
+    if not p then
+        return nil, err
+    elseif jit then
+        -- jit compile
+        local ok
+        ok, err = p:jit_compile()
+        if not ok then
+            return nil, err
+        end
+    end
+    self.p = p
+    self.global = global
+    self.lastidx = 0
+
+    -- save into cache table
+    if cache then
+        RECACHE[cache_key] = self
+    end
+
+    return self
+end
 
 --- matches
 --- @param sbj string
@@ -227,71 +276,17 @@ function Regex:test(sbj, offset)
     return false, err
 end
 
---- new
---- @param pattern string
---- @param flgs? string
---- @return Regex? regex
---- @return any err
-local function new(pattern, flgs)
-    local re
-
-    assert(type(pattern) == 'string', 'pattern must be string')
-    if flgs == nil then
-        flgs = ''
-    else
-        assert(type(flgs) == 'string', 'flgs must be string')
-    end
-
-    -- parse flags
-    local cache_key = pattern .. '@' .. flgs
-    local opts, global, cache, jit = flgs2opts(flgs)
-    -- check the cache table
-    if cache then
-        re = RECACHE[cache_key]
-    end
-
-    if not re then
-        -- compile
-        local p, err = pcre2.new(pattern, unpack(opts))
-
-        if not p then
-            return nil, err
-        elseif jit then
-            -- jit compile
-            local ok
-            ok, err = p:jit_compile()
-            if not ok then
-                return nil, err
-            end
-        end
-
-        -- create instance
-        re = setmetatable({
-            p = p,
-            global = global,
-            lastidx = 0,
-        }, {
-            __index = Regex,
-        })
-
-        -- save into cache table
-        if cache then
-            RECACHE[cache_key] = re
-        end
-    end
-
-    return re
-end
+Regex = require('metamodule').new(Regex)
 
 --- matches
 --- @param sbj string
 --- @param pattern string
---- @param flgs? string
+--- @param flags? string
 --- @param offset? integer
 --- @return string[]? arr
 --- @return any err
-local function matches(sbj, pattern, flgs, offset)
-    local re, err = new(pattern, flgs)
+local function matches(sbj, pattern, flags, offset)
+    local re, err = Regex(pattern, flags)
     if err then
         return nil, err
     end
@@ -301,12 +296,12 @@ end
 --- match
 --- @param sbj string
 --- @param pattern string
---- @param flgs? string
+--- @param flags? string
 --- @param offset? integer
 --- @return string[]? arr
 --- @return any err
-local function match(sbj, pattern, flgs, offset)
-    local re, err = new(pattern, flgs)
+local function match(sbj, pattern, flags, offset)
+    local re, err = Regex(pattern, flags)
     if err then
         return nil, err
     end
@@ -316,13 +311,13 @@ end
 --- indexesof
 --- @param sbj string
 --- @param pattern string
---- @param flgs? string
+--- @param flags? string
 --- @param offset? integer
 --- @return integer[]? heads
 --- @return integer[]? tails
 --- @return any err
-local function indexesof(sbj, pattern, flgs, offset)
-    local re, err = new(pattern, flgs)
+local function indexesof(sbj, pattern, flags, offset)
+    local re, err = Regex(pattern, flags)
     if err then
         return nil, nil, err
     end
@@ -332,13 +327,13 @@ end
 --- indexof
 --- @param sbj string
 --- @param pattern string
---- @param flgs? string
+--- @param flags? string
 --- @param offset? integer
 --- @return integer[]? heads
 --- @return integer[]? tails
 --- @return any err
-local function indexof(sbj, pattern, flgs, offset)
-    local re, err = new(pattern, flgs)
+local function indexof(sbj, pattern, flags, offset)
+    local re, err = Regex(pattern, flags)
     if err then
         return nil, nil, err
     end
@@ -348,12 +343,12 @@ end
 --- test
 --- @param sbj string
 --- @param pattern string
---- @param flgs? string
+--- @param flags? string
 --- @param offset? integer
 --- @return boolean ok
 --- @return any err
-local function test(sbj, pattern, flgs, offset)
-    local re, err = new(pattern, flgs, offset)
+local function test(sbj, pattern, flags, offset)
+    local re, err = Regex(pattern, flags)
     if err then
         return false, err
     end
@@ -361,7 +356,7 @@ local function test(sbj, pattern, flgs, offset)
 end
 
 return {
-    new = new,
+    new = Regex,
     matches = matches,
     match = match,
     indexesof = indexesof,
