@@ -229,25 +229,32 @@ end
 --- indexof
 --- @param sbj string
 --- @param offset? integer
---- @return integer[]? heads
---- @return integer[]? tails
+--- @return integer[]? arr
 --- @return any err
 function Regex:indexof(sbj, offset)
     local heads, tails, err = self.p:match(sbj, offset or self.lastidx)
 
-    -- found
     if heads then
+        local arr = {}
+        local idx = 1
+
+        for i = 1, #heads do
+            arr[idx], arr[idx + 1] = heads[i], tails[i]
+            idx = idx + 2
+        end
+
         -- updaet a last-index if global option is enabled
         if self.global == true then
             self.lastidx = tails[1]
         end
-        return heads, tails
+
+        return arr
+    elseif err then
+        return nil, err
     elseif self.global then
         -- reset a last-index to 0 if global option is enabled
         self.lastidx = 0
     end
-
-    return nil, nil, err
 end
 
 --- test
@@ -325,13 +332,12 @@ end
 --- @param pattern string
 --- @param flags? string
 --- @param offset? integer
---- @return integer[]? heads
---- @return integer[]? tails
+--- @return integer[]? arr
 --- @return any err
 local function indexof(sbj, pattern, flags, offset)
     local re, err = Regex(pattern, flags)
     if err then
-        return nil, nil, err
+        return nil, err
     end
     return re:indexof(sbj, offset)
 end
