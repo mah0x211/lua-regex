@@ -1,21 +1,19 @@
 # lua-regex
 
-regular expression for lua.
+[![test](https://github.com/mah0x211/lua-regex/actions/workflows/test.yml/badge.svg)](https://github.com/mah0x211/lua-regex/actions/workflows/test.yml)
+[![codecov](https://codecov.io/gh/mah0x211/lua-regex/branch/master/graph/badge.svg)](https://codecov.io/gh/mah0x211/lua-regex)
 
-**NOTE:** this module is under heavy development.
+
+simple regular expression module for lua.
 
 
-## Dependencies
+## Installation
 
-- lua-pcre2: <https://github.com/mah0x211/lua-pcre2>
-
----
-
-## regex module
-
-```lua
-local regex = require('regex')
+```sh
+luarocks install regex
 ```
+
+***
 
 
 ## Regular expression flags
@@ -37,7 +35,7 @@ local regex = require('regex')
 
 creates a new regex object.
 
-**Params**
+**Parameters**
 
 - `pattern:string`: string containing expression to be compiled.
 - `flgs:string`: [regular expression flags](#regular-expression-flags).
@@ -47,15 +45,34 @@ creates a new regex object.
 - `re:table`: regex object.
 - `err:string`: error message.
 
+**Example**
+
+```lua
+local regex = require('regex')
+local re, err = regex.new('a(b+)(c+)', 'i')
+if re then
+    local arr, err = re:match('ABBBCCC')
+    if arr then
+        print(arr[1]) -- 'ABBBCCC'
+        print(arr[2]) -- 'BBB'
+        print(arr[3]) -- 'CCC'
+    else
+        print(err)
+    end
+else
+    print(err)
+end
+```
+
 
 ## Instance Methods
 
 
-### arr, err = re:match( sbj [, offset] )
+## arr, err = regex:match( sbj [, offset] )
 
 matches a compiled regular expression against a given subject string. It returns matched substrings.
 
-**Params**
+**Parameters**
 
 - `sbj:string`: the subject string.
 - `offset:number`: offset in the subject at which to start matching.
@@ -66,11 +83,11 @@ matches a compiled regular expression against a given subject string. It returns
 - `err:string`: error message.
 
 
-### arr, err = re:matches( sbj [, offset] )
+## arr, err = regex:matches( sbj [, offset] )
 
 almost same as `match` method but it returns all matched substrings except capture strings.
 
-**Params**
+**Parameters**
 
 - `sbj:string`: the subject string.
 - `offset:number`: offset in the subject at which to start matching.
@@ -81,43 +98,41 @@ almost same as `match` method but it returns all matched substrings except captu
 - `err:string`: error message.
 
 
-### heads, tails, err = re:indexof( sbj [, offset] )
+## arr, err = regex:indexof( sbj [, offset] )
 
 almost same as `match` method but it returns offsets of matched substrings.
 
-**Params**
+**Parameters**
 
 - `sbj:string`: the subject string.
 - `offset:number`: offset in the subject at which to start matching.
 
 **Returns**
 
-- `heads:table`: array of head offset of matched substrings.
-- `tails:table`: array of tail offset of matched substrings.
+- `arr:table`: array of offsets of matched substrings. 1st index is the start offset of matched substring, and 2nd index is the end offset of matched substring, and 3rd index is the start offset of 1st capture string, and 4th index is the end offset of 1st capture string, and so on.
 - `err:string`: error message.
 
 
-### heads, tails, err = re:indexesof( sbj [, offset] )
+## arr, err = regex:indexesof( sbj [, offset] )
 
-almost same as `match` method but it returns all offsets of matched substrings except capture strings.
+almost same as `match` method but it returns all offsets of matched substrings **except capture strings**.
 
-**Params**
+**Parameters**
 
 - `sbj:string`: the subject string.
 - `offset:number`: offset in the subject at which to start matching.
 
 **Returns**
 
-- `heads:table`: array of head offset of matched substrings.
-- `tails:table`: array of tail offset of matched substrings.
+- `arr:table`: array of offsets of matched substrings. 1st index is the start offset of matched substring, and 2nd index is the end offset of matched substring, and so on.
 - `err:string`: error message.
 
 
-### ok, err = re:test( sbj [, offset] )
+## ok, err = regex:test( sbj [, offset] )
 
 returns true if there is a matched.
 
-**Params**
+**Parameters**
 
 - `sbj:string`: the subject string.
 - `offset:number`: offset in the subject at which to start matching.
@@ -132,89 +147,67 @@ returns true if there is a matched.
 ## Static Methods
 
 
-### arr, err = regex.match( sbj, pattern [, flgs [, offset]] )
+## arr, err = regex.match( sbj, pattern [, flgs [, offset]] )
 
-same as `match` instance method.
+same as the following code:
 
-**Params**
-
-- `sbj:string`: the subject string.
-- `pattern:string`: string containing expression to be compiled.
-- `flgs:string`: [regular expression flags](#regular-expression-flags).
-- `offset:number`: offset in the subject at which to start matching.
-
-**Returns**
-
-- `arr:table`: array of matched substrings.
-- `err:string`: error message.
+```lua
+local re, err = regex.new( pattern, flgs )
+if re then
+    return re:match( sbj, offset )
+end
+return nil, err
+```
 
 
-### arr, err = regex.matches( sbj, pattern [, flgs [, offset]] )
+## arr, err = regex.matches( sbj, pattern [, flgs [, offset]] )
 
-same as `matches` instance method.
+same as the following code:
 
-**Params**
-
-- `sbj:string`: the subject string.
-- `pattern:string`: string containing expression to be compiled.
-- `flgs:string`: [regular expression flags](#regular-expression-flags).
-- `offset:number`: offset in the subject at which to start matching.
-
-**Returns**
-
-- `arr:table`: array of matched substrings.
-- `err:string`: error message.
+```lua
+local re, err = regex.new( pattern, flgs )
+if re then
+    return re:matches( sbj, offset )
+end
+return nil, err
+```
 
 
-### heads, tails, err = regex.indexof( sbj, pattern [, flgs [, offset]] )
+## arr, err = regex.indexof( sbj, pattern [, flgs [, offset]] )
 
-same as `indexof` instance method.
+same as the following code:
 
-**Params**
-
-- `sbj:string`: the subject string.
-- `pattern:string`: string containing expression to be compiled.
-- `flgs:string`: [regular expression flags](#regular-expression-flags).
-- `offset:number`: offset in the subject at which to start matching.
-
-**Returns**
-
-- `heads:table`: array of head offset of matched substrings.
-- `tails:table`: array of tail offset of matched substrings.
-- `err:string`: error message.
+```lua
+local re, err = regex.new( pattern, flgs )
+if re then
+    return re:indexof( sbj, offset )
+end
+return nil, err
+```
 
 
-### heads, tails, err = regex.indexesof( sbj, pattern [, flgs [, offset]] )
+## arr, err = regex.indexesof( sbj, pattern [, flgs [, offset]] )
 
-same as `indexesof` instance method.
+same as the following code:
 
-**Params**
-
-- `sbj:string`: the subject string.
-- `pattern:string`: string containing expression to be compiled.
-- `flgs:string`: [regular expression flags](#regular-expression-flags).
-- `offset:number`: offset in the subject at which to start matching.
-
-**Returns**
-
-- `heads:table`: array of head offset of matched substrings.
-- `tails:table`: array of tail offset of matched substrings.
-- `err:string`: error message.
+```lua
+local re, err = regex.new( pattern, flgs )
+if re then
+    return re:indexesof( sbj, offset )
+end
+return nil, err
+```
 
 
-### ok, err = regex.test( sbj, pattern [, flgs [, offset]] )
+## ok, err = regex.test( sbj, pattern [, flgs [, offset]] )
 
-same as `test` instance method.
+same as the following code:
 
-**Params**
-
-- `sbj:string`: the subject string.
-- `pattern:string`: string containing expression to be compiled.
-- `flgs:string`: [regular expression flags](#regular-expression-flags).
-- `offset:number`: offset in the subject at which to start matching.
-
-**Returns**
-
-- `ok:boolean`: true on matched.
-- `err:string`: error message.
+```lua
+local re, err = regex.new( pattern, flgs )
+if re then
+    return re:test( sbj, offset )
+end
+return nil, err
+```
 

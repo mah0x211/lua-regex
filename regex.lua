@@ -176,26 +176,26 @@ end
 --- @return string[]? arr
 --- @return any err
 function Regex:match(sbj, offset)
-    local head, tail, err = self.p:match(sbj, offset or self.lastidx)
+    local heads, tails, err = self.p:match(sbj, offset or self.lastidx)
 
-    if head then
+    if heads then
         -- found
         local arr = {}
-        for i = 1, #head do
-            arr[i] = sub(sbj, head[i], tail[i])
+        for i = 1, #heads do
+            arr[i] = sub(sbj, heads[i], tails[i])
         end
 
         -- updaet a last-index if global option is enabled
         if self.global == true then
-            self.lastidx = tail[1]
+            self.lastidx = tails[1]
         end
         return arr
+    elseif err then
+        return nil, err
     elseif self.global then
         -- reset a last-index to 0 if global option is enabled
         self.lastidx = 0
     end
-
-    return nil, err
 end
 
 --- indexesof
@@ -291,10 +291,10 @@ Regex = require('metamodule').new(Regex)
 --- @return any err
 local function matches(sbj, pattern, flags, offset)
     local re, err = Regex(pattern, flags)
-    if err then
-        return nil, err
+    if re then
+        return re:matches(sbj, offset)
     end
-    return re:matches(sbj, offset)
+    return nil, err
 end
 
 --- match
@@ -306,10 +306,10 @@ end
 --- @return any err
 local function match(sbj, pattern, flags, offset)
     local re, err = Regex(pattern, flags)
-    if err then
-        return nil, err
+    if re then
+        return re:match(sbj, offset)
     end
-    return re:match(sbj, offset)
+    return nil, err
 end
 
 --- indexesof
@@ -321,10 +321,10 @@ end
 --- @return any err
 local function indexesof(sbj, pattern, flags, offset)
     local re, err = Regex(pattern, flags)
-    if err then
-        return nil, err
+    if re then
+        return re:indexesof(sbj, offset)
     end
-    return re:indexesof(sbj, offset)
+    return nil, err
 end
 
 --- indexof
@@ -336,10 +336,10 @@ end
 --- @return any err
 local function indexof(sbj, pattern, flags, offset)
     local re, err = Regex(pattern, flags)
-    if err then
-        return nil, err
+    if re then
+        return re:indexof(sbj, offset)
     end
-    return re:indexof(sbj, offset)
+    return nil, err
 end
 
 --- test
@@ -351,10 +351,10 @@ end
 --- @return any err
 local function test(sbj, pattern, flags, offset)
     local re, err = Regex(pattern, flags)
-    if err then
-        return false, err
+    if re then
+        return re:test(sbj, offset)
     end
-    return re:test(sbj, offset)
+    return false, err
 end
 
 return {
