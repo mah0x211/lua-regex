@@ -13,32 +13,27 @@ simple regular expression module for lua.
 luarocks install regex
 ```
 
+
 ***
 
 
-## Regular expression flags
-
-- `i`: Do caseless matching.
-- `s`: `.` matches anything including NL.
-- `m`: `^` and `$` match newlines within data.
-- `u`: Treat pattern and subjects as UTF strings.
-- `U`: Do not check the pattern for `UTF` valid.
-- `x`: Ignore white space and `#` comments.
-- `o`: compile-once mode that caching a compiled regex.
-- `g`: global match.
-- `j`: enable JIT compilation.
-
-
-## Creating a Regex object
-
-### re, err = regex.new( pattern [, flgs] )
+## re, err = regex.new( pattern [, flgs] )
 
 creates a new regex object.
 
 **Parameters**
 
 - `pattern:string`: string containing expression to be compiled.
-- `flgs:string`: [regular expression flags](#regular-expression-flags).
+- `flgs:string`: regular expression flags that can be combined with any of the following characters.
+    - `i`: Do caseless matching.
+    - `s`: `.` matches anything including NL.
+    - `m`: `^` and `$` match newlines within data.
+    - `u`: Treat pattern and subjects as UTF strings.
+    - `U`: Do not check the pattern for `UTF` valid.
+    - `x`: Ignore white space and `#` comments.
+    - `o`: compile-once mode that caching a compiled regex.
+    - `g`: global match.
+    - `j`: enable JIT compilation.
 
 **Returns**
 
@@ -65,8 +60,6 @@ end
 ```
 
 
-## Instance Methods
-
 
 ## arr, err = regex:match( sbj [, offset] )
 
@@ -85,7 +78,7 @@ matches a compiled regular expression against a given subject string. It returns
 
 ## arr, err = regex:matches( sbj [, offset] )
 
-almost same as `match` method but it returns all matched substrings except capture strings.
+almost same as `match` method but it returns all matched substrings **except capture strings**.
 
 **Parameters**
 
