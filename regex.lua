@@ -201,32 +201,29 @@ end
 --- indexesof
 --- @param sbj string
 --- @param offset? integer
---- @return integer[]? heads
---- @return integer[]? tails
+--- @return integer[]? arr
 --- @return any err
 function Regex:indexesof(sbj, offset)
     local head, tail, err = self.p:match_nocap(sbj, offset)
 
-    -- found
     if head then
-        local heads = {}
-        local tails = {}
+        local arr = {}
         local idx = 1
 
         while head do
-            heads[idx], tails[idx] = head, tail
-            idx = idx + 1
-
+            arr[idx], arr[idx + 1] = head, tail
+            idx = idx + 2
             head, tail, err = self.p:match_nocap(sbj, tail)
         end
+
         if err then
-            return nil, nil, err
+            return nil, err
         end
 
-        return heads, tails
+        return arr
+    elseif err then
+        return nil, err
     end
-
-    return nil, nil, err
 end
 
 --- indexof
@@ -313,13 +310,12 @@ end
 --- @param pattern string
 --- @param flags? string
 --- @param offset? integer
---- @return integer[]? heads
---- @return integer[]? tails
+--- @return integer[]? arr
 --- @return any err
 local function indexesof(sbj, pattern, flags, offset)
     local re, err = Regex(pattern, flags)
     if err then
-        return nil, nil, err
+        return nil, err
     end
     return re:indexesof(sbj, offset)
 end
